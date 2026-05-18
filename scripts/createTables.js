@@ -16,7 +16,7 @@ async function createTables() {
       new CreateTableCommand({
         TableName: "Users",
         AttributeDefinitions: [
-          { AttributeName: "userId", AttributeType: "S" },
+          { AttributeName: "userId", AttributeType: "S" },//"S" shows that the userId must be a string
         ],
         KeySchema: [
           { AttributeName: "userId", KeyType: "HASH" },

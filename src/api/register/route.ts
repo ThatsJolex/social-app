@@ -1,11 +1,12 @@
+ 
 import { NextRequest, NextResponse } from "next/server"
 import { PutCommand } from "@aws-sdk/lib-dynamodb"
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb"
-import { dynamo } from "@/lib/dynamodb"
+import { dynamodb } from "@/lib/dynamodb"
 import bcrypt from "bcryptjs"
 import { v4 as uuidv4 } from "uuid"
 
-const docClient = DynamoDBDocumentClient.from(dynamo)
+const docClient = DynamoDBDocumentClient.from(dynamodb)
 
 export async function POST(req: NextRequest) {
   try {

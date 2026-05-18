@@ -1,0 +1,10 @@
+export default function LoginPage() {
+  return (
+    <div>
+      <h1>Login</h1>
+      <input placeholder="Email" />
+      <input placeholder="Password" type="password" />
+      <button>Login</button>
+    </div>
+  )
+}

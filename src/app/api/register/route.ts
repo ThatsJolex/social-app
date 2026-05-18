@@ -1,36 +1,62 @@
- 
-import { NextRequest, NextResponse } from "next/server"
-import { PutCommand } from "@aws-sdk/lib-dynamodb"
-import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb"
-import { dynamodb } from "@/lib/dynamodb"
+import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { v4 as uuidv4 } from "uuid"
 
-const docClient = DynamoDBDocumentClient.from(dynamodb)
+import { dynamodb } from "@/lib/dynamodb"
 
-export async function POST(req: NextRequest) {
+import {
+  PutCommand,
+  ScanCommand,
+} from "@aws-sdk/lib-dynamodb"
+
+export async function POST(request: Request) {
   try {
-    const body = await req.json()
+    const body = await request.json()
 
     const { username, email, password } = body
 
+    // Validation
     if (!username || !email || !password) {
       return NextResponse.json(
-        { error: "Missing fields" },
+        { error: "All fields required" },
         { status: 400 }
       )
     }
 
+    // Check if email already exists
+    const existingUsers = await dynamodb.send(
+      new ScanCommand({
+        TableName: "Users",
+        FilterExpression: "email = :email",
+        ExpressionAttributeValues: {
+          ":email": email,
+        },
+      })
+    )
+
+    if (existingUsers.Items && existingUsers.Items.length > 0) {
+      return NextResponse.json(
+        { error: "Email already exists" },
+        { status: 400 }
+      )
+    }
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
+    // Create user object
     const user = {
-      userId: uuidv4(),
+      id: uuidv4(),
       username,
       email,
       password: hashedPassword,
+      followers: [],
+      following: [],
+      createdAt: new Date().toISOString(),
     }
 
-    await docClient.send(
+    // Save user
+    await dynamodb.send(
       new PutCommand({
         TableName: "Users",
         Item: user,
@@ -38,8 +64,14 @@ export async function POST(req: NextRequest) {
     )
 
     return NextResponse.json({
-      message: "User created",
+      message: "User created successfully",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
     })
+
   } catch (error) {
     console.error(error)
 

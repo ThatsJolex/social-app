@@ -1,11 +1,10 @@
-GET http://localhost:3000/api/register
-
-###
-
 POST http://localhost:3000/api/register
 Content-Type: application/json
-
+console.log("BODY:", body)
+console.log("AWS REGION:", process.env.AWS_REGION)
 {
-  "name": "Jolex",
-  "email": "test@test.com"
+  "username": "Jolex",
+  "email": "test@test.com",
+  "password": "123456"
+  console.error("REGISTER ERROR:", error)
 }

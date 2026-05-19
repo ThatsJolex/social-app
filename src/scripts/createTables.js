@@ -28,6 +28,30 @@ async function createTables() {
 
     console.log("Users table created")
 
+    await client.send(
+  new CreateTableCommand({
+    TableName: "Posts",
+
+    AttributeDefinitions: [
+      {
+        AttributeName: "postId",
+        AttributeType: "S",
+      },
+    ],
+
+    KeySchema: [
+      {
+        AttributeName: "postId",
+        KeyType: "HASH",
+      },
+    ],
+
+    BillingMode: "PAY_PER_REQUEST",
+  })
+)
+
+console.log("Posts table created")
+
     // POSTS TABLE
     await client.send(
       new CreateTableCommand({

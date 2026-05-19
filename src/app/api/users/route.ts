@@ -1,15 +1,23 @@
 import { NextResponse } from "next/server"
+import { ScanCommand } from "@aws-sdk/lib-dynamodb"
+import { dynamodb } from "@/lib/dynamodb"
 
 export async function GET() {
-  return NextResponse.json({
-    message: "Users API working",
-  })
-}
+  try {
+    const data = await dynamodb.send(
+      new ScanCommand({
+        TableName: "Users",
+      })
+    )
 
-export async function POST(request: Request) {
-  const body = await request.json()
+    return NextResponse.json(data.Items || [])
 
-  return NextResponse.json({
-    received: body,
-  })
+  } catch (error) {
+    console.error(error)
+
+    return NextResponse.json(
+      { error: "Failed to fetch users" },
+      { status: 500 }
+    )
+  }
 }

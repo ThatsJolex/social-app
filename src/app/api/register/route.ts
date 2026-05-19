@@ -1,61 +1,37 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { PutCommand } from "@aws-sdk/lib-dynamodb"
+import { dynamodb } from "@/lib/dynamodb"
 import bcrypt from "bcryptjs"
 import { v4 as uuidv4 } from "uuid"
 
-import { dynamodb } from "@/lib/dynamodb"
+export async function GET() {
+  return NextResponse.json({
+    message: "Register route works",
+  })
+}
 
-import {
-  PutCommand,
-  ScanCommand,
-} from "@aws-sdk/lib-dynamodb"
-
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await req.json()
 
     const { username, email, password } = body
 
-    // Validation
     if (!username || !email || !password) {
       return NextResponse.json(
-        { error: "All fields required" },
+        { error: "Missing fields" },
         { status: 400 }
       )
     }
 
-    // Check if email already exists
-    const existingUsers = await dynamodb.send(
-      new ScanCommand({
-        TableName: "Users",
-        FilterExpression: "email = :email",
-        ExpressionAttributeValues: {
-          ":email": email,
-        },
-      })
-    )
-
-    if (existingUsers.Items && existingUsers.Items.length > 0) {
-      return NextResponse.json(
-        { error: "Email already exists" },
-        { status: 400 }
-      )
-    }
-
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create user object
     const user = {
-      id: uuidv4(),
+      userId: uuidv4(),
       username,
       email,
       password: hashedPassword,
-      followers: [],
-      following: [],
-      createdAt: new Date().toISOString(),
     }
 
-    // Save user
     await dynamodb.send(
       new PutCommand({
         TableName: "Users",
@@ -64,12 +40,7 @@ export async function POST(request: Request) {
     )
 
     return NextResponse.json({
-      message: "User created successfully",
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      },
+      message: "User created",
     })
 
   } catch (error) {

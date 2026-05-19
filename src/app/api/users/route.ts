@@ -10,7 +10,7 @@ export async function GET() {
       })
     )
 
-    return NextResponse.json(data.Items || [])
+    return NextResponse.json(data.Items)
 
   } catch (error) {
     console.error(error)

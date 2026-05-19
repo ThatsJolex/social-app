@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/immutability */
 /* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
+
 "use client"
 
 import { useEffect, useState } from "react"
@@ -13,6 +15,7 @@ type User = {
 }
 
 type Post = {
+  userId: string
   postId: string
   content: string
   imageUrl: string
@@ -45,19 +48,54 @@ export default function FeedPage() {
 
     setUser(parsedUser)
 
-    fetchPosts()
-  }, [router])
+    fetchPosts(parsedUser)
+  }, [])
 
   //
   // FETCH POSTS
   //
-  const fetchPosts = async () => {
+  const fetchPosts = async (currentUser: User) => {
     try {
+      //
+      // GET FOLLOWING
+      //
+      const followResponse = await fetch(
+        `/api/following?userId=${currentUser.userId}`
+      )
+
+      const followingData = await followResponse.json()
+
+      const followingIds = Array.isArray(followingData)
+  ? followingData.map(
+      (follow: { followingId: string }) =>
+        follow.followingId
+    )
+  : []
+
+      //
+      // INCLUDE YOUR OWN POSTS
+      //
+      followingIds.push(currentUser.userId)
+
+      //
+      // GET POSTS
+      //
       const response = await fetch("/api/posts")
 
       const data = await response.json()
 
-      const sortedPosts = data.sort(
+      //
+      // FILTER POSTS
+      //
+      const filteredPosts = data.filter(
+        (post: Post) =>
+          followingIds.includes(post.userId)
+      )
+
+      //
+      // SORT POSTS
+      //
+      const sortedPosts = filteredPosts.sort(
         (a: Post, b: Post) =>
           b.createdAt - a.createdAt
       )

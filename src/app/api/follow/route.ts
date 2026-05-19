@@ -8,26 +8,21 @@ export async function POST(req: NextRequest) {
 
     const { followerId, followingId } = body
 
-    if (!followerId || !followingId) {
-      return NextResponse.json(
-        { error: "Missing fields" },
-        { status: 400 }
-      )
+    const follow = {
+      followId: crypto.randomUUID(),
+      followerId,
+      followingId,
     }
 
     await dynamodb.send(
       new PutCommand({
         TableName: "Follows",
-
-        Item: {
-          followerId,
-          followingId,
-        },
+        Item: follow,
       })
     )
 
     return NextResponse.json({
-      message: "Followed successfully",
+      message: "Followed user",
     })
 
   } catch (error) {

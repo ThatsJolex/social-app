@@ -1,4 +1,5 @@
  
+ 
 /* eslint-disable react-hooks/immutability */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -33,7 +34,9 @@ export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([])
 
   const [content, setContent] = useState("")
-  const [imageUrl, setImageUrl] = useState("")
+
+  const [selectedFile, setSelectedFile] =
+  useState<File | null>(null)
 
   //
   // CHECK LOGIN
@@ -113,6 +116,31 @@ export default function FeedPage() {
   // CREATE POST
   //
   const handleCreatePost = async () => {
+    let uploadedImageUrl = ""
+
+//
+// UPLOAD IMAGE
+//
+if (selectedFile) {
+
+  const formData = new FormData()
+
+  formData.append("file", selectedFile)
+
+  const uploadResponse = await fetch(
+    "/api/upload",
+    {
+      method: "POST",
+      body: formData,
+    }
+  )
+
+  const uploadData =
+    await uploadResponse.json()
+
+  uploadedImageUrl =
+    uploadData.imageUrl
+}
     if (!user || !content.trim()) return
 
     try {
@@ -125,7 +153,7 @@ export default function FeedPage() {
 
         body: JSON.stringify({
           content,
-          imageUrl,
+          imageUrl: uploadedImageUrl,
           userId: user.userId,
           username: user.username,
         }),
@@ -136,7 +164,7 @@ export default function FeedPage() {
       setPosts(prev => [data.post, ...prev])
 
       setContent("")
-      setImageUrl("")
+      setSelectedFile(null)
 
     } catch (error) {
       console.error(error)
@@ -178,14 +206,17 @@ export default function FeedPage() {
         />
 
         <input
-          placeholder="Image URL (optional)"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          style={{
-            width: "100%",
-            marginTop: "10px",
-          }}
-        />
+  type="file"
+  accept="image/*"
+  onChange={(e) => {
+    if (e.target.files?.[0]) {
+      setSelectedFile(e.target.files[0])
+    }
+  }}
+  style={{
+    marginTop: "10px",
+  }}
+/>
 
         <button
           onClick={handleCreatePost}

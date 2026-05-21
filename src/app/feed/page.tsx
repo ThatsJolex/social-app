@@ -1,3 +1,4 @@
+ 
 /* eslint-disable react-hooks/immutability */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -7,6 +8,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 type User = {
   userId: string
@@ -212,7 +214,16 @@ export default function FeedPage() {
               padding: "15px",
             }}
           >
-            <h3>{post.username}</h3>
+            <Link href={`/profile/${post.userId}`}>
+  <h3
+    style={{
+      cursor: "pointer",
+      color: "blue",
+    }}
+  >
+    {post.username}
+  </h3>
+</Link>
 
             <p>{post.content}</p>
 

@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server"
-import { QueryCommand } from "@aws-sdk/lib-dynamodb"
+import { ScanCommand } from "@aws-sdk/lib-dynamodb"
 import { dynamodb } from "@/lib/dynamodb"
 
 export async function GET(req: NextRequest) {
-
   try {
-
     const userId =
       req.nextUrl.searchParams.get("userId")
 
@@ -16,20 +15,25 @@ export async function GET(req: NextRequest) {
       )
     }
 
+    //
+    // GET ALL FOLLOWS
+    //
     const data = await dynamodb.send(
-      new QueryCommand({
+      new ScanCommand({
         TableName: "Follows",
-
-        KeyConditionExpression:
-          "followerId = :followerId",
-
-        ExpressionAttributeValues: {
-          ":followerId": userId,
-        },
       })
     )
 
-    return NextResponse.json(data.Items || [])
+    //
+    // FILTER ONLY CURRENT USER FOLLOWS
+    //
+    const following =
+      data.Items?.filter(
+        (follow: any) => 
+          follow.followerId === userId
+      ) || []
+
+    return NextResponse.json(following)
 
   } catch (error) {
     console.error(error)

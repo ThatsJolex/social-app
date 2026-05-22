@@ -24,6 +24,7 @@ type Post = {
   imageUrl: string
   username: string
   createdAt: number
+  likes?: number
 }
 
 export default function FeedPage() {
@@ -257,6 +258,34 @@ if (selectedFile) {
 </Link>
 
             <p>{post.content}</p>
+
+            <button
+  onClick={async () => {
+    try {
+      await fetch("/api/like", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          postId: post.postId,
+        }),
+      })
+
+      fetchPosts(user)
+
+    } catch (error) {
+      console.error(error)
+    }
+  }}
+  style={{
+    marginTop: "10px",
+  }}
+>
+  Like ({post.likes || 0})
+</button>
 
             {post.imageUrl && (
               <img

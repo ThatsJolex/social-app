@@ -1,5 +1,6 @@
  
  
+ 
 /* eslint-disable react-hooks/immutability */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -27,6 +28,13 @@ type Post = {
   likes?: number
 }
 
+type Comment = {
+  commentId: string
+  postId: string
+  username: string
+  text: string
+}
+
 export default function FeedPage() {
   const router = useRouter()
 
@@ -35,6 +43,10 @@ export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([])
 
   const [content, setContent] = useState("")
+
+  const [comments, setComments] = useState<{
+  [key: string]: Comment[]
+}>({})
 
   const [selectedFile, setSelectedFile] =
   useState<File | null>(null)
@@ -107,6 +119,25 @@ export default function FeedPage() {
       )
 
       setPosts(sortedPosts)
+      //
+// FETCH COMMENTS
+//
+const commentsMap: {
+  [key: string]: Comment[]
+} = {}
+
+for (const post of sortedPosts) {
+
+  const response = await fetch(
+    `/api/comments?postId=${post.postId}`
+  )
+
+  const data = await response.json()
+
+  commentsMap[post.postId] = data
+}
+
+setComments(commentsMap)
 
     } catch (error) {
       console.error(error)
@@ -258,6 +289,83 @@ if (selectedFile) {
 </Link>
 
             <p>{post.content}</p>
+
+            <div
+  style={{
+    marginTop: "15px",
+  }}
+>
+  <input
+    placeholder="Write a comment..."
+    onKeyDown={async (e) => {
+
+      if (e.key !== "Enter") return
+
+      const text =
+        e.currentTarget.value
+
+      if (!text.trim()) return
+
+      try {
+
+        const input = e.currentTarget
+
+await fetch("/api/comments", {
+  method: "POST",
+
+  headers: {
+    "Content-Type":
+      "application/json",
+  },
+
+  body: JSON.stringify({
+    postId: post.postId,
+    userId: user.userId,
+    username: user.username,
+    text,
+  }),
+})
+
+input.value = ""
+
+fetchPosts(user)
+
+      } catch (error) {
+        console.error(error)
+      }
+    }}
+    style={{
+      width: "100%",
+      marginTop: "10px",
+    }}
+  />
+
+  <div
+    style={{
+      marginTop: "10px",
+    }}
+  >
+    {(Array.isArray(comments[post.postId])
+  ? comments[post.postId]
+  : []
+).map(
+      (comment) => (
+        <div
+          key={comment.commentId}
+          style={{
+            marginBottom: "8px",
+          }}
+        >
+          <strong>
+            {comment.username}
+          </strong>
+
+          : {comment.text}
+        </div>
+      )
+    )}
+  </div>
+</div>
 
             <button
   onClick={async () => {

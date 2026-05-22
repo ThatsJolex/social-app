@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb"
+import { DeleteCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb"
 import { dynamodb } from "@/lib/dynamodb"
 
 export async function POST(req: NextRequest) {
@@ -33,6 +33,35 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Failed to create post" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const body = await req.json()
+
+    const { postId } = body
+
+    await dynamodb.send(
+      new DeleteCommand({
+        TableName: "Posts",
+        Key: {
+          postId,
+        },
+      })
+    )
+
+    return NextResponse.json({
+      message: "Post deleted",
+    })
+
+  } catch (error) {
+    console.error(error)
+
+    return NextResponse.json(
+      { error: "Failed to delete post" },
       { status: 500 }
     )
   }

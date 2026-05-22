@@ -367,6 +367,39 @@ fetchPosts(user)
   </div>
 </div>
 
+{user.userId === post.userId && (
+  <button
+    onClick={async () => {
+      try {
+
+        await fetch("/api/posts", {
+          method: "DELETE",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            postId: post.postId,
+          }),
+        })
+
+        fetchPosts(user)
+
+      } catch (error) {
+        console.error(error)
+      }
+    }}
+    style={{
+      marginTop: "10px",
+      marginBottom: "10px",
+    }}
+  >
+    Delete Post
+  </button>
+)}
+
             <button
   onClick={async () => {
     try {

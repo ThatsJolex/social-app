@@ -526,12 +526,10 @@ export default function FeedPage() {
                               "application/json",
                           },
 
-                          body: JSON.stringify(
-                            {
-                              postId:
-                                post.postId,
-                            }
-                          ),
+                          body: JSON.stringify({
+  postId: post.postId,
+  userId: user.userId,
+}),
                         }
                       )
 

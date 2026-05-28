@@ -1,6 +1,10 @@
 export const dynamic = "force-dynamic"
+
 import Link from "next/link"
+import Navbar from "@/components/Navbar"
+
 import { ScanCommand } from "@aws-sdk/lib-dynamodb"
+
 import { dynamodb } from "@/lib/dynamodb"
 
 type User = {
@@ -28,31 +32,58 @@ export default async function UsersPage() {
     <div
       style={{
         maxWidth: "700px",
-        margin: "20px auto",
+        margin: "0 auto",
+        padding: "20px",
       }}
     >
-      <h1>Find Users</h1>
+      <Navbar />
+
+      <h1
+        style={{
+          marginBottom: "25px",
+        }}
+      >
+        Find Users
+      </h1>
 
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "15px",
+          gap: "18px",
         }}
       >
         {users.map((user) => (
           <div
             key={user.userId}
             style={{
-              border: "1px solid #ccc",
-              padding: "10px",
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "14px",
+              boxShadow:
+                "0 2px 10px rgba(0,0,0,0.08)",
             }}
           >
             <Link
               href={`/profile/${user.userId}`}
             >
-              {user.username}
+              <h2
+                style={{
+                  color: "#2563eb",
+                }}
+              >
+                {user.username}
+              </h2>
             </Link>
+
+            <p
+              style={{
+                color: "#6b7280",
+                marginTop: "5px",
+              }}
+            >
+              {user.email}
+            </p>
           </div>
         ))}
       </div>

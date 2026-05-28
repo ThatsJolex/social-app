@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Navbar from "@/components/Navbar"
 
 type User = {
   userId: string
@@ -236,6 +237,9 @@ export default function FeedPage() {
         backgroundColor: "#f3f4f6",
       }}
     >
+      <><Navbar />
+      <div></div>
+      </>
       {/* NAVBAR */}
       <div
         style={{
@@ -271,26 +275,7 @@ export default function FeedPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            localStorage.removeItem(
-              "user"
-            )
-
-            router.push("/login")
-          }}
-          style={{
-            padding: "10px 16px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#ef4444",
-            color: "white",
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-        >
-          Logout
-        </button>
+        
       </div>
 
       {/* CREATE POST */}

@@ -5,6 +5,7 @@
 
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import Navbar from "@/components/Navbar"
 
 type User = {
   userId: string
@@ -153,6 +154,7 @@ export default function DiscoverPage() {
         padding: "20px",
       }}
     >
+      <Navbar />
       <h1
         style={{
           fontSize: "32px",

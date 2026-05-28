@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/immutability */
 /* eslint-disable @next/next/no-img-element */
+
 "use client"
 
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
+import Navbar from "@/components/Navbar"
 
 type User = {
   userId: string
@@ -26,8 +28,11 @@ export default function ProfilePage() {
 
   const userId = params.userId as string
 
-  const [user, setUser] = useState<User | null>(null)
-  const [posts, setPosts] = useState<Post[]>([])
+  const [user, setUser] =
+    useState<User | null>(null)
+
+  const [posts, setPosts] =
+    useState<Post[]>([])
 
   useEffect(() => {
     fetchProfile()
@@ -35,25 +40,21 @@ export default function ProfilePage() {
 
   const fetchProfile = async () => {
     try {
-      //
-      // GET USER
-      //
       const userResponse = await fetch(
         `/api/users/${userId}`
       )
 
-      const userData = await userResponse.json()
+      const userData =
+        await userResponse.json()
 
       setUser(userData)
 
-      //
-      // GET POSTS
-      //
       const postsResponse = await fetch(
         "/api/posts"
       )
 
-      const postsData = await postsResponse.json()
+      const postsData =
+        await postsResponse.json()
 
       const filteredPosts = postsData
         .filter(
@@ -73,27 +74,76 @@ export default function ProfilePage() {
   }
 
   if (!user) {
-    return <p>Loading profile...</p>
+    return <p>Loading...</p>
   }
 
   return (
     <div
       style={{
         maxWidth: "700px",
-        margin: "20px auto",
+        margin: "0 auto",
+        padding: "20px",
       }}
     >
-      <h1>{user.username}</h1>
+      <Navbar />
 
-      <p>{user.email}</p>
-
-      <hr
+      <div
         style={{
-          margin: "20px 0",
+          backgroundColor: "white",
+          borderRadius: "14px",
+          padding: "25px",
+          boxShadow:
+            "0 2px 10px rgba(0,0,0,0.08)",
+          marginBottom: "25px",
         }}
-      />
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "15px",
+          }}
+        >
+          <div
+            style={{
+              width: "70px",
+              height: "70px",
+              borderRadius: "50%",
+              backgroundColor: "#d1d5db",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "28px",
+              fontWeight: "bold",
+            }}
+          >
+            {user.username
+              .charAt(0)
+              .toUpperCase()}
+          </div>
 
-      <h2>Posts</h2>
+          <div>
+            <h1>{user.username}</h1>
+
+            <p
+              style={{
+                color: "#6b7280",
+                marginTop: "5px",
+              }}
+            >
+              {user.email}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h2
+        style={{
+          marginBottom: "20px",
+        }}
+      >
+        Posts
+      </h2>
 
       <div
         style={{
@@ -106,11 +156,20 @@ export default function ProfilePage() {
           <div
             key={post.postId}
             style={{
-              border: "1px solid #ccc",
-              padding: "15px",
+              backgroundColor: "white",
+              borderRadius: "14px",
+              padding: "20px",
+              boxShadow:
+                "0 2px 10px rgba(0,0,0,0.08)",
             }}
           >
-            <p>{post.content}</p>
+            <p
+              style={{
+                lineHeight: "1.6",
+              }}
+            >
+              {post.content}
+            </p>
 
             {post.imageUrl && (
               <img
@@ -118,7 +177,8 @@ export default function ProfilePage() {
                 alt="Post"
                 style={{
                   width: "100%",
-                  marginTop: "10px",
+                  borderRadius: "12px",
+                  marginTop: "15px",
                 }}
               />
             )}

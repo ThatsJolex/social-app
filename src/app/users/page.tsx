@@ -1,7 +1,7 @@
-/* eslint-disable react-hooks/immutability */
-"use client"
-
-import { useEffect, useState } from "react"
+export const dynamic = "force-dynamic"
+import Link from "next/link"
+import { ScanCommand } from "@aws-sdk/lib-dynamodb"
+import { dynamodb } from "@/lib/dynamodb"
 
 type User = {
   userId: string
@@ -9,51 +9,20 @@ type User = {
   email: string
 }
 
-export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([])
+async function getUsers(): Promise<User[]> {
 
-  useEffect(() => {
-    fetchUsers()
-  }, [])
+  const data = await dynamodb.send(
+    new ScanCommand({
+      TableName: "Users",
+    })
+  )
 
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch("/api/users")
+  return (data.Items as User[]) || []
+}
 
-      const data = await response.json()
+export default async function UsersPage() {
 
-      setUsers(data)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const handleFollow = async (followingId: string) => {
-    try {
-      const storedUser = localStorage.getItem("user")
-
-      if (!storedUser) return
-
-      const currentUser = JSON.parse(storedUser)
-
-      await fetch("/api/follow", {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        body: JSON.stringify({
-          followerId: currentUser.userId,
-          followingId,
-        }),
-      })
-
-      alert("User followed")
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  const users = await getUsers()
 
   return (
     <div
@@ -68,7 +37,7 @@ export default function UsersPage() {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
+          gap: "15px",
         }}
       >
         {users.map((user) => (
@@ -76,18 +45,14 @@ export default function UsersPage() {
             key={user.userId}
             style={{
               border: "1px solid #ccc",
-              padding: "15px",
+              padding: "10px",
             }}
           >
-            <h3>{user.username}</h3>
-
-            <p>{user.email}</p>
-
-            <button
-              onClick={() => handleFollow(user.userId)}
+            <Link
+              href={`/profile/${user.userId}`}
             >
-              Follow
-            </button>
+              {user.username}
+            </Link>
           </div>
         ))}
       </div>

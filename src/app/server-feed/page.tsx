@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
-
+export const dynamic = "force-dynamic"
 import { getAllPosts } from "@/lib/posts"
 
 export default async function ServerFeedPage() {

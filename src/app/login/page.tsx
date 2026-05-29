@@ -46,10 +46,21 @@ export default function LoginPage() {
         return
       }
 
+      //
+      // SAVE USER
+      //
       localStorage.setItem(
         "user",
         JSON.stringify(data.user)
       )
+
+      //
+      // SAVE COOKIE
+      //
+      document.cookie =
+        `user=${encodeURIComponent(
+          JSON.stringify(data.user)
+        )}; path=/`
 
       router.push("/feed")
 

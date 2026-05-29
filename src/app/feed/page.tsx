@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/immutability */
 /* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 /* eslint-disable @next/next/no-img-element */
 
 "use client"
@@ -8,9 +8,10 @@
 export const dynamic = "force-dynamic"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+
 import Link from "next/link"
 import Navbar from "@/components/Navbar"
+
 
 type User = {
   userId: string
@@ -36,7 +37,7 @@ type Comment = {
 }
 
 export default function FeedPage() {
-  const router = useRouter()
+  
 
   const [user, setUser] = useState<User | null>(null)
 
@@ -52,22 +53,24 @@ export default function FeedPage() {
     useState<File | null>(null)
 
   //
-  // CHECK LOGIN
-  //
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user")
+// LOAD USER
+//
+useEffect(() => {
+  const storedUser =
+    localStorage.getItem("user")
 
-    if (!storedUser) {
-      router.push("/login")
-      return
-    }
+  if (!storedUser) {
+    return
+  }
 
-    const parsedUser = JSON.parse(storedUser)
+  const parsedUser =
+    JSON.parse(storedUser)
 
-    setUser(parsedUser)
+  setUser(parsedUser)
 
-    fetchPosts(parsedUser)
-  }, [])
+  fetchPosts(parsedUser)
+
+}, [])
 
   //
   // FETCH POSTS
@@ -466,11 +469,14 @@ export default function FeedPage() {
                         },
 
                         body: JSON.stringify(
-                          {
-                            postId:
-                              post.postId,
-                          }
-                        ),
+  {
+    postId:
+      post.postId,
+
+    userId:
+      user.userId,
+  }
+),
                       }
                     )
 
